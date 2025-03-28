@@ -4,25 +4,107 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scientific Number Validation</title>
+  <!-- Ganti script jsPDF di head dengan ini -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  // Inisialisasi namespace jsPDF
+  window.jsPDF = window.jspdf.jsPDF;
+</script>
   <style>
+    @font-face {
+    font-family: 'Bakso Sapi';
+    src: url('fonts/BaksoSapi.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    }
+
     body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Bakso Sapi', 'Segoe UI', cursive, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
     margin: 0;
+    background: url('foto/Cross-background.gif') no-repeat center center fixed;
+    background-size: cover;
     }
 
+    .action-buttons {
+    position: fixed; /* Ubah dari absolute ke fixed */
+    top: 20px;
+    right: 20px;
+    z-index: 10; /* Kurangi dari 1000 ke 10 */
+    display: flex;
+    gap: 10px;
+    }
+
+   /* Style dasar tombol (untuk kedua tombol) */
+   .action-btn {
+      padding: 8px 16px;
+      color: rgb(22, 3, 3);
+      border: none;
+      border-radius: 20px;
+      font-family: 'Bakso Sapi', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-size: 14px;
+    }
+
+    /* Efek hover untuk kedua tombol */
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      opacity: 0.9;
+    }
+
+    .creator-info {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  font-family: 'Bakso Sapi', sans-serif;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.creator-info.show {
+  opacity: 1;
+}
+
     .container {
+    position: relative; 
+    z-index: 1;
     text-align: center;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.85);
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     max-width: 400px;
     width: 100%;
+    backdrop-filter: blur(5px);
+    }
+
+    .pdf-btn {
+    padding: 8px 16px;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 20px;
+    font-family: 'Bakso Sapi', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .pdf-btn:hover {
+    background-color: hsl(0, 0%, 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
     h1 {
@@ -74,27 +156,32 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="action-buttons">
+    <button class="action-btn" id="aboutBtn">About Us</button>
+    <button class="action-btn" id="savePdf">Save as PDF</button>
+  </div>
+  
+  <!-- Tambahkan div untuk menampilkan nama -->
+  <div id="creatorInfo" class="creator-info"></div>
+
+<div class="container">
     <h1 style="font-size:28px;">Scientific Number Validation</h1>
-    <h2 style="font-size:16px;">created by Serafin Salindeho</h2>
     <input type="text" id="numberInput" placeholder="Enter a number (e.g., 1.23e5)">
     <p class="message" id="result"></p>
   </div>
 
   <script>
-    document.getElementById("numberInput").addEventListener("input", function () {
-  // Ambil nilai dari input
+ // Fungsi validasi (tetap sama)
+document.getElementById("numberInput").addEventListener("input", function() {
   const input = document.getElementById("numberInput").value;
   const resultElement = document.getElementById("result");
 
-  // Jika input kosong, hilangkan pesan
   if (input.trim() === "") {
     resultElement.textContent = "";
     resultElement.className = "message";
-    return; // Keluar dari fungsi
+    return;
   }
 
-  // Gunakan regular expression untuk memeriksa apakah input adalah angka ilmiah
   const scientificNumberRegex = /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/;
 
   if (scientificNumberRegex.test(input)) {
@@ -103,6 +190,43 @@
   } else {
     resultElement.textContent = "No, it is not a number";
     resultElement.className = "message error show";
+  }
+});
+
+// Fungsi About Us (tetap sama)
+document.getElementById("aboutBtn").addEventListener("click", function() {
+  const creatorInfo = document.getElementById("creatorInfo");
+  creatorInfo.textContent = "Created by Serafin Salindeho";
+  creatorInfo.classList.add("show");
+  
+  setTimeout(() => {
+    creatorInfo.classList.remove("show");
+  }, 3000);
+});
+
+// Fungsi Save as PDF yang DIPERBAIKI
+document.getElementById("savePdf").addEventListener("click", function() {
+  // Pastikan jsPDF sudah terload
+  if (typeof jsPDF !== 'undefined') {
+    const doc = new jsPDF();
+    
+    const inputValue = document.getElementById("numberInput").value || "No input";
+    const validationResult = document.getElementById("result").textContent || "No validation";
+    const timestamp = new Date().toLocaleString();
+    
+    doc.setFont("helvetica");
+    doc.setFontSize(16);
+    doc.text("Scientific Number Validation Report", 15, 20);
+    
+    doc.setFontSize(12);
+    doc.text(`Date: ${timestamp}`, 15, 30);
+    doc.text(`Input: ${inputValue}`, 15, 40);
+    doc.text(`Result: ${validationResult}`, 15, 50);
+    
+    const filename = `Validation_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.pdf`;
+    doc.save(filename);
+  } else {
+    alert("PDF library failed to load. Please try again later.");
   }
 });
   </script>
