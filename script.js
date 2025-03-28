@@ -1,4 +1,3 @@
- // Fungsi validasi (tetap sama)
 document.getElementById("numberInput").addEventListener("input", function() {
   const input = document.getElementById("numberInput").value;
   const resultElement = document.getElementById("result");
@@ -23,7 +22,7 @@ document.getElementById("numberInput").addEventListener("input", function() {
 // Fungsi About Us (tetap sama)
 document.getElementById("aboutBtn").addEventListener("click", function() {
   const creatorInfo = document.getElementById("creatorInfo");
-  creatorInfo.textContent = "Created by Serafin Salindeho";
+  creatorInfo.textContent = "Created by Serafin Arthasista Salindeho (231011060036)";
   creatorInfo.classList.add("show");
   
   setTimeout(() => {
